@@ -1,10 +1,10 @@
-import express, { Express, Request, Response } from 'express'
+import express, { Express } from 'express'
 import http, { Server } from 'http'
-import { resolve } from 'path'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
 import createServer from './graphql/createServer'
+import reactRender from './reactRender'
 
 const PORT: string|number = process.env.PORT || 3000
 
@@ -15,18 +15,16 @@ app.use(cors({
   credentials: true,
 }))
 app.use(cookieParser())
-app.use(express.static('./build'))
+app.use(express.static('./build', {
+  index: false,
+}))
 
-app.get('/*', (req: Request, res: Response) => {
-  res.sendFile(resolve('./build/index.html'), (error) => {
-    if (error) {
-      res.status(500).send(error)
-    }
-  })
-})
+// Support React routing and SSR.
+app.get('/*', reactRender)
 
 const httpServer: Server = http.createServer(app)
 
+// Create a Apollo server.
 const server = createServer(httpServer)
 
 server.start().then(() => {
