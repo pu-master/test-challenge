@@ -6,11 +6,18 @@
   "scripts": {
     "build:server": "cross-env NODE_ENV=development TOKEN_SECRET=default_secret webpack --config config/webpack.server.js --mode=development",
     "build:client": "cross-env NODE_ENV=development webpack --config config/webpack.client.js --mode=development",
+    "build:server:prod": "webpack --config config/webpack.server.js",
+    "build:client:prod": "webpack --config config/webpack.client.js",
     "start": "npm run build:server && npm run build:client && node build/server.js",
+    "start:prod": "prisma generate && npm run build:server:prod && npm run build:client:prod && node build/server.js",
     "test": "jest tests"
   },
   "author": "Adel Tahir <pu.master72@gmail.com>",
   "license": "ISC",
+  "engines": {
+    "npm": ">=6.14.14",
+    "node": ">=14.17.4"
+  },
   "dependencies": {
     "@apollo/client": "^3.6.8",
     "@emotion/react": "^11.9.3",
