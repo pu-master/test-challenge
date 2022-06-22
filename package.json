@@ -4,13 +4,13 @@
   "description": "Tipaw take-home challenge",
   "main": "index.js",
   "scripts": {
+    "build": "prisma generate && npm run build:server:prod && npm run build:client:prod",
     "build:server": "cross-env NODE_ENV=development TOKEN_SECRET=default_secret webpack --config config/webpack.server.js --mode=development",
     "build:client": "cross-env NODE_ENV=development webpack --config config/webpack.client.js --mode=development",
     "build:server:prod": "webpack --config config/webpack.server.js",
     "build:client:prod": "webpack --config config/webpack.client.js",
-    "start": "npm run build:server && npm run build:client && node build/server.js",
-    "start:prod": "prisma generate && npm run build:server:prod && npm run build:client:prod && node build/server.js",
-    "heroku-prebuild": "npm install --dev",
+    "dev": "npm run build:server && npm run build:client && node build/server.js",
+    "start": "node build/server.js",
     "test": "jest tests"
   },
   "author": "Adel Tahir <pu.master72@gmail.com>",
