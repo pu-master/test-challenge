@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-server-core'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, User } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -18,6 +18,36 @@ interface SignupArgs {
   password: string
 }
 
+const generateToken = (user: User) => (
+  jwt.sign(
+    {
+      userId: user.id,
+    },
+    process.env.TOKEN_SECRET || 'default_token_secret'
+  )
+)
+
+// Get information of a currently logged in user.
+const getAccount = async (parent: any, args: any, context: any) => {
+  if (!context.userId) {
+    return null
+  }
+
+  try {
+    const prisma = new PrismaClient()
+    const user: User|null = await prisma.user.findUnique({
+      where: {
+        id: context.userId,
+      },
+    })
+    return user
+  } catch (error) {
+    //
+  }
+  return null
+}
+
+// Sign up a new user.
 const signup = async (parent: any, args: SignupArgs) => {
   const { firstName, lastName, phone, email, password } = args
 
@@ -57,7 +87,7 @@ const signup = async (parent: any, args: SignupArgs) => {
     const hash = bcrypt.hashSync(password, salt)
 
     // Create a user record.
-    const user = await prisma.user.create({
+    const user: User = await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -67,15 +97,8 @@ const signup = async (parent: any, args: SignupArgs) => {
       }
     })
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-      },
-      process.env.TOKEN_SECRET || 'default_token_secret'
-    )
-
     return {
-      token,
+      token: generateToken(user),
     }
   } catch (error) {
     if ((error as ApolloError).code === 'P2002') {
@@ -85,12 +108,38 @@ const signup = async (parent: any, args: SignupArgs) => {
   }
 }
 
+// Log in.
+const login = async (parent: any, args: SignupArgs) => {
+  const { email, password } = args
+
+  const prisma = new PrismaClient()
+
+  const user: User|null = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  })
+
+  if (!user) {
+    throw new ApolloError('Invalid email or password.')
+  }
+
+  if (!bcrypt.compareSync(password, user.password)) {
+    throw new ApolloError('Invalid email or password.')
+  }
+
+  return {
+    token: generateToken(user),
+  }
+}
+
 const resolvers = {
   Query: {
-    isLoggedIn: () => false,
+    account: getAccount,
   },
   Mutation: {
     signup,
+    login,
   },
 }
 

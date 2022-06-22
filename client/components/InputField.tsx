@@ -60,23 +60,27 @@ interface Props {
   type?: string
   label: string
   image?: string
-  error: string
-  onValidate: Function
+  error?: string
+  onValidate?: Function
   onChange: Function
 }
 
-function InputField({ type = 'text', label, image, error, onValidate, onChange }: Props) {
+function InputField({ type = 'text', label, image, error = '', onValidate, onChange }: Props) {
   const [value, setValue] = useState('')
 
   const handleChange = (event: React.ChangeEvent) => {
     const newValue: string = (event.target as HTMLInputElement).value
     setValue(newValue)
     onChange(newValue)
-    onValidate(newValue)
+    if (onValidate) {
+      onValidate(newValue)
+    }
   }
 
   const handleBlur = (event: React.SyntheticEvent) => {
-    onValidate((event.target as HTMLInputElement).value)
+    if (onValidate) {
+      onValidate((event.target as HTMLInputElement).value)
+    }
   }
 
   return (

@@ -1,27 +1,33 @@
-import express, { Express } from 'express'
-import { ApolloServer } from 'apollo-server-express'
-import { gql, ApolloServerPluginDrainHttpServer, ApolloError } from 'apollo-server-core'
+import express, { Express, Request, Response } from 'express'
 import http, { Server } from 'http'
-import { PrismaClient } from '@prisma/client'
+import { resolve } from 'path'
+import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
-import typeDefs from './graphql/schema'
-import resolvers from './graphql/resolvers'
+import createServer from './graphql/createServer'
 
 const PORT: string|number = process.env.PORT || 3000
 
 const app: Express = express()
 
+app.use(cors({
+  origin: '*',
+  credentials: true,
+}))
+app.use(cookieParser())
 app.use(express.static('./build'))
+
+app.get('/*', (req: Request, res: Response) => {
+  res.sendFile(resolve('./build/index.html'), (error) => {
+    if (error) {
+      res.status(500).send(error)
+    }
+  })
+})
 
 const httpServer: Server = http.createServer(app)
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: true,
-  cache: 'bounded',
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-})
+const server = createServer(httpServer)
 
 server.start().then(() => {
   server.applyMiddleware({

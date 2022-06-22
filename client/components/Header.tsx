@@ -9,10 +9,14 @@ const style = css`
   color: #5acee8;
 `
 
-function Header() {
+interface Props {
+  label: string
+}
+
+function Header({ label }: Props) {
   return (
     <div css={style}>
-      S'inscrire
+      { label }
     </div>
   )
 }
