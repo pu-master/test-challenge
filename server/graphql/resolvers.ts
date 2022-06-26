@@ -3,6 +3,8 @@ import { PrismaClient, User } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
+import prisma from '../prismaClient'
+
 import {
   validatorRequired,
   validatorPhone,
@@ -34,7 +36,6 @@ const getAccount = async (parent: any, args: any, context: any) => {
   }
 
   try {
-    const prisma = new PrismaClient()
     const user: User|null = await prisma.user.findUnique({
       where: {
         id: context.userId,
@@ -80,8 +81,6 @@ const signup = async (parent: any, args: SignupArgs) => {
       throw new ApolloError(error)
     }
 
-    const prisma = new PrismaClient()
-
     // Hash password.
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(password, salt)
@@ -111,8 +110,6 @@ const signup = async (parent: any, args: SignupArgs) => {
 // Log in.
 const login = async (parent: any, args: SignupArgs) => {
   const { email, password } = args
-
-  const prisma = new PrismaClient()
 
   const user: User|null = await prisma.user.findUnique({
     where: {
