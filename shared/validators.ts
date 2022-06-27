@@ -81,6 +81,7 @@
   }
   return ''
 }
+
 /**
  * A validator for a required checkbox field.
  * @param value {boolean} The input value.
