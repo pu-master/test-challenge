@@ -31,7 +31,7 @@ function FbButton() {
         css={css(styleButton, styleFbButton)}
       >
         <div css={styleImgWrapper}>
-          <img src={FbIconPath.default} alt="Google" />
+          <img src={FbIconPath.default} alt="Facebook" />
         </div>
         Inscription avec Facebook
       </button>
