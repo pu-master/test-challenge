@@ -1,4 +1,4 @@
-# Tipaw take-home challenge
+# Tipaw challenge
 
 First, you need to set your database URL in `prisma/.env` file.
 

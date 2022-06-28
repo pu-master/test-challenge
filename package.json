@@ -1,7 +1,7 @@
 {
   "name": "tipaw-challenge",
   "version": "1.0.0",
-  "description": "Tipaw take-home challenge",
+  "description": "Tipaw challenge",
   "main": "index.js",
   "scripts": {
     "build": "prisma generate && npm run build:server:prod && npm run build:client:prod",
